@@ -208,7 +208,7 @@ function osd_directory {
     # Check to see if our OSD has been initialized
     if [ ! -e /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring ]; then
       echo "Create OSD key and file structure for OSD with ID ${OSD_ID}"
-      ceph-osd ${CEPH_OPTS} --id ${OSD_ID} --mkfs --mkkey --mkjournal --osd-journal ${OSD_J} --setuser ceph --setgroup ceph
+      ceph-osd ${CEPH_OPTS} --id ${OSD_ID} --mkfs --mkkey --mkjournal --osd-journal ${OSD_J} --setuser ceph --setgroup ceph -d
 
       if [ ! -e /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring ]; then
         echo "ERROR- /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring must exist. You can extract it from your current monitor by running 'ceph auth get client.bootstrap-osd -o /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring'"
