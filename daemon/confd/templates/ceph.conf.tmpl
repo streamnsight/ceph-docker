@@ -28,8 +28,8 @@
   auth supported = none
 {{end}}
 {{ if exists "/global"}}
-{{range gets "/global/*"}}
-  {{base .Key}} = {{.Value}}{{end}}
+  {{range gets "/global/*"}}
+    {{base .Key}} = {{.Value}}{{end}}
 {{end}}
 
 [mon]
