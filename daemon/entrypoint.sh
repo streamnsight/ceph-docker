@@ -188,10 +188,17 @@ function start_osd {
 #################
 
 function osd_directory {
-  if [[ ! -d /var/lib/ceph/osd || -n "$(find /var/lib/ceph/osd -prune -empty)" ]]; then
+  if [[ ! -d /var/lib/ceph/osd ]]; then
     echo "ERROR- could not find any OSD, did you bind mount the OSD data directory?"
     echo "ERROR- use -v <host_osd_data_dir>:<container_osd_data_dir>"
     exit 1
+  fi
+
+  if [[ -n "$(find /var/lib/ceph/osd -prune -empty)" ]]; then
+    echo "Creating osd"
+    OSD_ID=$(ceph create osd)
+    mkdir -p /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}
+    chown ceph. /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}
   fi
 
   for OSD_ID in $(ls /var/lib/ceph/osd |  awk 'BEGIN { FS = "-" } ; { print $2 }'); do
