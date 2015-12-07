@@ -27,10 +27,10 @@
   auth client required = none
   auth supported = none
 {{end}}
-{{ if exists "/global"}}
-  {{range gets "/global/*"}}
-    {{base .Key}} = {{.Value}}{{end}}
-{{end}}
+#{{ if exists "/global"}}
+#  {{range gets "/global/*"}}
+#    {{base .Key}} = {{.Value}}{{end}}
+#{{end}}
 
 [mon]
 {{range gets "/mon/*"}}
