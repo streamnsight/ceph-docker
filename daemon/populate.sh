@@ -34,8 +34,10 @@ kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/mo
 
 #osd
 kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/journal_size 100 || echo "value is already set"
-kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/cluster_network 192.168.42.0/24 || echo "value is already set"
-kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/public_network 192.168.42.0/24 || echo "value is already set"
+
+# these 2 should be passed at runtime to the container.
+#kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/cluster_network 198.100.128.0/19 || echo "value is already set"
+#kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/public_network 198.100.128.0/19 || echo "value is already set"
 kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/osd_mkfs_type xfs || echo "value is already set"
 kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/osd_mkfs_options_xfs "-f -i size=2048" || echo "value is already set"
 kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/osd/osd_mon_heartbeat_interval 30 || echo "value is already set"
