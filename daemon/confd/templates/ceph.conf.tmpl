@@ -27,27 +27,61 @@
   auth client required = none
   auth supported = none
 {{end}}
-#{{ if exists "/global"}}
-#  {{range gets "/global/*"}}
-#    {{base .Key}} = {{.Value}}{{end}}
-#{{end}}
+{{ range $i, $k := ls "/global" }}
+    {{ if not $i }}
+      # dir exists, not empty, we're at index 0 (which is boolean false)
+      # do something once
+      {{range gets "/global/*"}}
+        {{base .Key}} = {{.Value}}{{end}}
+    {{ end }}
+{{ end }}
 
 [mon]
-{{range gets "/mon/*"}}
-  {{base .Key}} = {{.Value}}{{end}}
-{{range gets "/mon_host/*"}}
-    [mon.{{base .Key}}]
-      host = {{base .Key}}
-      mon_addr = {{.Value}}{{end}}
+{{ range $i, $k := ls "/mon" }}
+    {{ if not $i }}
+      # dir exists, not empty, we're at index 0 (which is boolean false)
+      # do something once
+      {{range gets "/mon/*"}}
+        {{base .Key}} = {{.Value}}{{end}}
+    {{ end }}
+{{ end }}
+{{ range $i, $k := ls "/mon_host" }}
+    {{ if not $i }}
+      # dir exists, not empty, we're at index 0 (which is boolean false)
+      # do something once
+      {{range gets "/mon_host/*"}}
+          [mon.{{base .Key}}]
+            host = {{base .Key}}
+            mon_addr = {{.Value}}{{end}}
+    {{ end }}
+{{ end }}
 
 [osd]
-{{range gets "/osd/*"}}
-  {{base .Key}} = {{.Value}}{{end}}
+{{ range $i, $k := ls "/osd" }}
+    {{ if not $i }}
+      # dir exists, not empty, we're at index 0 (which is boolean false)
+      # do something once
+      {{range gets "/osd/*"}}
+        {{base .Key}} = {{.Value}}{{end}}
+    {{ end }}
+{{ end }}
 
 [mds]
-{{range gets "/mds/*"}}
-  {{base .Key}} = {{.Value}}{{end}}
+{{ range $i, $k := ls "/msd" }}
+    {{ if not $i }}
+      # dir exists, not empty, we're at index 0 (which is boolean false)
+      # do something once
+      {{range gets "/mds/*"}}
+        {{base .Key}} = {{.Value}}{{end}}
+    {{ end }}
+{{ end }}
 
 [client]
-{{range gets "/client/*"}}
-  {{base .Key}} = {{.Value}}{{end}}
+{{ range $i, $k := ls "/msd" }}
+    {{ if not $i }}
+      # dir exists, not empty, we're at index 0 (which is boolean false)
+      # do something once
+      {{range gets "/client/*"}}
+        {{base .Key}} = {{.Value}}{{end}}
+    {{ end }}
+{{ end }}

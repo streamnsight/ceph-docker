@@ -57,10 +57,6 @@ function get_mon_config {
 
     FSID=$(uuidgen)
     kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/auth/fsid ${FSID}
-    until kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} exists ${CLUSTER_PATH}/auth/fsid ${FSID} > /dev/null 2>&1 ; do
-      echo "Waiting for kviator to register the fsid"
-      sleep 1
-    done
 
     until confd -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
       echo "Waiting for confd to write initial templates..."
