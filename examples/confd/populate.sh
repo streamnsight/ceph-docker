@@ -3,9 +3,9 @@
 set -x
 
 CLUSTER="ceph"
-KV="consul"
+KV="etcd"
 IP="127.0.0.1"
-PORT="8500"
+PORT="4001"
 CLUSTER_PATH=ceph-config/${CLUSTER}
 
 # auth
