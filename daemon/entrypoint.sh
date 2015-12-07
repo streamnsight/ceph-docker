@@ -189,8 +189,8 @@ function start_osd {
 
 function osd_directory {
   if [[ ! -d /var/lib/ceph/osd ]]; then
-    echo "ERROR- could not find any OSD, did you bind mount the OSD data directory?"
-    echo "ERROR- use -v <host_osd_data_dir>:<container_osd_data_dir>"
+    echo "ERROR- could not find the osd directory, did you bind mount the OSD data directory?"
+    echo "ERROR- use -v <host_osd_data_dir>:/var/lib/ceph/osd"
     exit 1
   fi
 
@@ -199,11 +199,13 @@ function osd_directory {
 
   # check if anything is there, if not create an osd with directory
   if [[ -n "$(find /var/lib/ceph/osd -prune -empty)" ]]; then
-    echo "Creating osd"
-    OSD_ID=$(ceph ${CEPH_OPTS} --name client.bootstrap-osd --keyring /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring osd create)
+    echo "Creating osd with ceph osd create"
+    OSD_ID=$(ceph osd create)
+    echo "OSD created with ID: ${OSD_ID}"
     # create the folder and own it
     mkdir -p /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}
     chown ceph. /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}
+    echo "created folder /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}"
   fi
 
   for OSD_ID in $(ls /var/lib/ceph/osd |  awk 'BEGIN { FS = "-" } ; { print $2 }'); do
@@ -219,7 +221,8 @@ function osd_directory {
 
     # Check to see if our OSD has been initialized
     if [ ! -e /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring ]; then
-      echo "Create OSD key and file structure for OSD with ID ${OSD_ID} on cluster ${CEPH_OPTS}"
+      echo "OSD with ID ${OSD_ID} needs to be initialized"
+      echo "Create OSD key and file structure for OSD with ID ${OSD_ID} on cluster ${CLUSTER}"
       ceph-osd -i ${OSD_ID} --mkfs --mkkey --mkjournal --osd-journal ${OSD_J} --setuser ceph --setgroup ceph -d ${CEPH_OPTS}
 
       if [ ! -e /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring ]; then
@@ -227,15 +230,17 @@ function osd_directory {
         exit 1
       fi
 
+      echo $(date '+%Y %b %d %H:%M:%S') "checking health with bootstrap keyring"
       timeout 10 ceph ${CEPH_OPTS} --name client.bootstrap-osd --keyring /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring health || exit 1
 
+      echo $(date '+%Y %b %d %H:%M:%S') "Add the OSD key"
       # Add the OSD key
       ceph ${CEPH_OPTS} --name client.bootstrap-osd --keyring /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring auth add osd.${OSD_ID} -i /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring osd 'allow *' mon 'allow profile osd'
       chown ceph. /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring
       chmod 0600 /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring
       create_socket_dir
 
-      # Add the OSD to the CRUSH map
+      echo $(date '+%Y %b %d %H:%M:%S') Add the OSD to the CRUSH map
       if [ ! -n "${HOSTNAME}" ]; then
         echo "HOSTNAME not set; cannot add OSD to CRUSH map"
         exit 1
@@ -244,15 +249,16 @@ function osd_directory {
       ceph ${CEPH_OPTS} --name=osd.${OSD_ID} --keyring=/var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring osd crush create-or-move -- ${OSD_ID} ${OSD_WEIGHT} ${CRUSH_LOCATION}
     fi
 
+    eco $(date '+%Y %b %d %H:%M:%S') "build the service"
     mkdir -p /etc/service/${CLUSTER}-${OSD_ID}
     cat >/etc/service/${CLUSTER}-${OSD_ID}/run <<EOF
 #!/bin/bash
 echo "store-daemon: starting daemon on ${HOSTNAME}..."
-exec ceph-osd ${CEPH_OPTS} -f -d -i ${OSD_ID} --osd-journal ${OSD_J} -k /var/lib/ceph/osd/ceph-${OSD_ID}/keyring
+exec ceph-osd ${CEPH_OPTS} -f -d -i ${OSD_ID} --osd-journal ${OSD_J} -k /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}/keyring
 EOF
     chmod +x /etc/service/${CLUSTER}-${OSD_ID}/run
   done
-
+echo $(date '+%Y %b %d %H:%M:%S') "Exec my_init"
 exec /sbin/my_init
 }
 
