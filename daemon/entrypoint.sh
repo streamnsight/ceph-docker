@@ -196,7 +196,7 @@ function osd_directory {
 
   if [[ -n "$(find /var/lib/ceph/osd -prune -empty)" ]]; then
     echo "Creating osd"
-    OSD_ID=$(ceph create osd)
+    OSD_ID=$(ceph osd create)
     mkdir -p /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}
     chown ceph. /var/lib/ceph/osd/${CLUSTER}-${OSD_ID}
   fi
