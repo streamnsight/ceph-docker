@@ -77,7 +77,7 @@
 {{ end }}
 
 [client]
-{{ range $i, $k := ls "/msd" }}
+{{ range $i, $k := ls "/client" }}
     {{ if not $i }}
       # dir exists, not empty, we're at index 0 (which is boolean false)
       # do something once
