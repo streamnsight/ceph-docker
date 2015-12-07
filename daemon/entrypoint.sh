@@ -65,6 +65,7 @@ chown ceph. /var/run/ceph
 # based on the data store
 case "$KV_TYPE" in
    etcd|consul)
+      source /populate.sh
       source /config.kv.sh
       ;;
    *)
@@ -186,6 +187,17 @@ function start_osd {
 #################
 # OSD_DIRECTORY #
 #################
+
+function clean_osd_directory {
+    echo "Removing OSD, it's directory, key and content... No going back"
+    for OSD_ID in $(ls /var/lib/ceph/osd |  awk 'BEGIN { FS = "-" } ; { print $2 }'); do
+        # for loop but there should only always be one OSD
+        ceph osd down ${OSD_ID}
+        ceph osd rm ${OSD_ID}
+        ceph auth del osd.${OSD_ID}
+        rm -rf /var/lib/ceph/osd/*
+    done
+}
 
 function osd_directory {
   if [[ ! -d /var/lib/ceph/osd ]]; then
@@ -489,6 +501,9 @@ case "$CEPH_DAEMON" in
    osd_directory)
       OSD_TYPE="directory"
       start_osd
+      ;;
+   clean_osd_directory)
+      clean_osd_directory
       ;;
    osd_ceph_disk)
       OSD_TYPE="disk"
