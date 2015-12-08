@@ -75,3 +75,5 @@ kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/cl
 
 #mds
 kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/mds/mds_cache_size 100000 || echo "value is already set"
+
+set +x
