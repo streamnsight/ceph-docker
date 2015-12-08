@@ -43,7 +43,7 @@ A recorded video on how to deploy your Ceph cluster entirely in Docker container
 IP=$(hostname -i) #note: this doesn't work on CoreOS, set the IP in your Unit file
 ```
 # start a monitor daemon with etcd backend on network range 198.100.128.0/19
-docker run -d --net=host --pid=host \ 
+docker run -d --net=host --pid=host \
 -v /etc/ceph:/etc/ceph \
 -v /var/lib/ceph:/var/lib/ceph \
 -e MON_IP=${IP} \
