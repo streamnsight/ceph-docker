@@ -10,13 +10,13 @@ function get_mon_config {
   CLUSTER_PATH=ceph-config/${CLUSTER}
 
   # making sure the root dirs are present for the confd to work
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/auth/_ _ > /dev/null 2>&1
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/global/_ _ > /dev/null 2>&1
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mon/_ _ > /dev/null 2>&1
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mon_host/_ _ > /dev/null 2>&1
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mds/_ _ > /dev/null 2>&1
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/osd/_ _ > /dev/null 2>&1
-  #kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/client/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/auth/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/global/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mon/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mon_host/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mds/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/osd/_ _ > /dev/null 2>&1
+  kviator --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/client/_ _ > /dev/null 2>&1
 
 
   echo "Adding Mon Host - ${MON_NAME}"

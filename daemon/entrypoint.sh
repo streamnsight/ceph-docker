@@ -65,7 +65,11 @@ chown ceph. /var/run/ceph
 # based on the data store
 case "$KV_TYPE" in
    etcd|consul)
-      source /populate.sh
+      if [[ ! -e "/etc/ceph/populate.sh" ]]; then
+        source /populate.sh
+      else
+        source /etc/ceph/populate.sh
+      fi
       source /config.kv.sh
       ;;
    *)
