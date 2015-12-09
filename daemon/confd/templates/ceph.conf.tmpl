@@ -3,8 +3,8 @@
 [global]
 {{ range $i, $k := ls "/auth" }}
     {{ if not $i }}
-        {{ if exists "/auth/fsid" }}
-          fsid = {{getv "/auth/fsid"}}
+      {{ if exists "/auth/fsid" }}
+fsid = {{getv "/auth/fsid"}}
         {{ end }}
     {{ end }}
 {{ end }}
@@ -12,29 +12,29 @@
 {{ range $i, $k := ls "/auth" }}
     {{ if not $i }}
       {{ if exists "/auth/cephx"}}
-        auth_cluster_required = cephx
-        auth_service_required = cephx
-        auth_client_required = cephx
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
         {{if exists "/auth/cephx_require_signatures"}}
-        cephx_require_signatures = {{getv "/auth/cephx_require_signatures"}} # Kernel RBD does NOT support signatures!
+cephx_require_signatures = {{getv "/auth/cephx_require_signatures"}} # Kernel RBD does NOT support signatures!
         {{else}}
-        cephx_require_signatures = false
+cephx_require_signatures = false
         {{end}}
         {{if exists "/auth/cephx_cluster_require_signatures"}}
-        cephx_cluster_require_signatures = {{getv "/auth/cephx_cluster_require_signatures"}}
+cephx_cluster_require_signatures = {{getv "/auth/cephx_cluster_require_signatures"}}
         {{else}}
-        cephx_cluster_require_signatures = true
+cephx_cluster_require_signatures = true
         {{end}}
         {{if exists "/auth/cephx_service_require_signatures"}}
-        cephx_service_require_signatures = {{getv "/auth/cephx_service_require_signatures"}}
+cephx_service_require_signatures = {{getv "/auth/cephx_service_require_signatures"}}
         {{else}}
-        cephx_service_require_signatures = false
+cephx_service_require_signatures = false
         {{end}}
       {{else}}
-        auth cluster required = none
-        auth service required = none
-        auth client required = none
-        auth supported = none
+auth cluster required = none
+auth service required = none
+auth client required = none
+auth supported = none
       {{end}}
     {{ end }}
 {{ end }}
@@ -42,7 +42,7 @@
 {{ range $i, $k := ls "/global" }}
     {{ if not $i }}
       {{range gets "/global/*"}}
-        {{base .Key}} = {{.Value}}{{end}}
+{{base .Key}} = {{.Value}}{{end}}
     {{ end }}
 {{ end }}
 
@@ -50,15 +50,15 @@
 {{ range $i, $k := ls "/mon" }}
     {{ if not $i }}
       {{range gets "/mon/*"}}
-        {{base .Key}} = {{.Value}}{{end}}
+{{base .Key}} = {{.Value}}{{end}}
     {{ end }}
 {{ end }}
 {{ range $i, $k := ls "/mon_host" }}
     {{ if not $i }}
       {{range gets "/mon_host/*"}}
-          [mon.{{base .Key}}]
-            host = {{base .Key}}
-            mon_addr = {{.Value}}{{end}}
+[mon.{{base .Key}}]
+host = {{base .Key}}
+mon_addr = {{.Value}}{{end}}
     {{ end }}
 {{ end }}
 
@@ -66,7 +66,7 @@
 {{ range $i, $k := ls "/osd" }}
     {{ if not $i }}
       {{range gets "/osd/*"}}
-        {{base .Key}} = {{.Value}}{{end}}
+{{base .Key}} = {{.Value}}{{end}}
     {{ end }}
 {{ end }}
 
@@ -74,7 +74,7 @@
 {{ range $i, $k := ls "/mds" }}
     {{ if not $i }}
       {{range gets "/mds/*"}}
-        {{base .Key}} = {{.Value}}{{end}}
+{{base .Key}} = {{.Value}}{{end}}
     {{ end }}
 {{ end }}
 
@@ -82,6 +82,6 @@
 {{ range $i, $k := ls "/client" }}
     {{ if not $i }}
       {{range gets "/client/*"}}
-        {{base .Key}} = {{.Value}}{{end}}
+{{base .Key}} = {{.Value}}{{end}}
     {{ end }}
 {{ end }}
