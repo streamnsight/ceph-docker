@@ -138,8 +138,10 @@ function start_mon {
 
   # get_mon_config is also responsible for bootstrapping the
   # cluster, if necessary
+  echo "Get mon config"
   get_mon_config
 
+  echo "check keyring"
   # If we don't have a monitor keyring, this is a new monitor
   if [ ! -e /var/lib/ceph/mon/${CLUSTER}-${MON_NAME}/keyring ]; then
 
@@ -153,6 +155,7 @@ function start_mon {
       exit 1
     fi
 
+    echo "check for keys"
     # Testing if it's not the first monitor, if one key doesn't exist we assume none of them exist
     ceph-authtool /tmp/${CLUSTER}.mon.keyring --create-keyring --import-keyring /etc/ceph/${CLUSTER}.client.admin.keyring
     ceph-authtool /tmp/${CLUSTER}.mon.keyring --import-keyring /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
@@ -161,13 +164,13 @@ function start_mon {
     ceph-authtool /tmp/${CLUSTER}.mon.keyring --import-keyring /etc/ceph/${CLUSTER}.mon.keyring
     chown ceph. /tmp/${CLUSTER}.mon.keyring
 
-    # Make the monitor directory
+    echo "Make the monitor directory"
     mkdir -p /var/lib/ceph/mon/${CLUSTER}-${MON_NAME}
     chown ceph. /var/lib/ceph/mon/${CLUSTER}-${MON_NAME}
 
     create_socket_dir
 
-    # Prepare the monitor daemon's directory with the map and keyring
+    echo "Prepare the monitor daemon's directory with the map and keyring"
     ceph-mon --setuser ceph --setgroup ceph --mkfs -i ${MON_NAME} --monmap /etc/ceph/monmap --keyring /tmp/${CLUSTER}.mon.keyring --mon-data /var/lib/ceph/mon/${CLUSTER}-${MON_NAME}
 
     # Clean up the temporary key
@@ -175,6 +178,7 @@ function start_mon {
   fi
 
   # start MON
+  echo "start monitor"
   exec /usr/bin/ceph-mon ${CEPH_OPTS} -d -i ${MON_NAME} --public-addr "${MON_IP}:6789" --setuser ceph --setgroup ceph
 }
 
