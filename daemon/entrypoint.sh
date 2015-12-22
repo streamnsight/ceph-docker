@@ -31,6 +31,7 @@ set -e
 : ${KV_TYPE:=none} # valid options: consul, etcd or none
 : ${KV_IP:=127.0.0.1}
 : ${KV_PORT:=4001} # PORT 8500 for Consul
+# if those ETCDCTL variables are defined, etcdctl will use them
 : ${ETCDCTL_CA_FILE:=} # etcd CA cert file path
 : ${ETCDCTL_CERT_FILE:=} # etcd client cert path
 : ${ETCDCTL_KEY_FILE:=} # etcd client key path
