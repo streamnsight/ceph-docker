@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+# confd TLS config string
+TLS_STRING=""
+if [[ -z "$ETCDCTL_CA_FILE" ]]; then
+  TLS_STRING="${TLS_STRING} -client-ca-keys=ETCDCTL_CA_FILE"
+fi
+if [[ -z "$ETCDCTL_CERT_FILE" ]]; then
+  TLS_STRING="${TLS_STRING} -client-cert=ETCDCTL_CERT_FILE"
+fi
+if [[ -z "$ETCDCTL_KEY_FILE" ]]; then
+  TLS_STRING="${TLS_STRING} -client-key=ETCDCTL_KEY_FILE"
+fi
+echo "TLS certs and key provided: using confd with $TLS_STRING"
+
+
 function kviatize {
     if [[ "$KV_TYPE" == "etcd" ]]; then
       CMD=$1
@@ -64,8 +78,7 @@ function get_mon_config {
   if kviatize get ${CLUSTER_PATH}/monSetupComplete > /dev/null 2>&1 ; then
     echo "Configuration found for cluster ${CLUSTER}. Writing to disk."
 
-
-    until confd -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
+    until confd ${TLS_STRING} -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
       echo "Waiting for confd to update templates..."
       sleep 1
     done
@@ -100,7 +113,7 @@ function get_mon_config {
     FSID=$(uuidgen)
     kviatize  put ${CLUSTER_PATH}/auth/fsid ${FSID}
 
-    until confd -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
+    until confd ${TLS_STRING} -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
       echo "Waiting for confd to write initial templates..."
       sleep 1
     done
@@ -153,7 +166,7 @@ function get_config {
     sleep 5
   done
 
-  until confd -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
+  until confd ${TLS_STRING} -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
     echo "Waiting for confd to update templates..."
     sleep 1
   done
