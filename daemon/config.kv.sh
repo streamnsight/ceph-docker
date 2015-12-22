@@ -19,7 +19,7 @@ function kviatize {
     if [[ "$KV_TYPE" == "etcd" ]]; then
       CMD=$1
       KEY=$2
-      VALUE=$3
+      VALUE=$*
       case "$CMD" in
         get)
           etcdctl -C ${KV_IP}:${KV_PORT} get "$KEY"
@@ -34,7 +34,7 @@ function kviatize {
           etcdctl -C ${KV_IP}:${KV_PORT} ls "$KEY"
         ;;
         cas)
-          etcdctl -C ${KV_IP}:${KV_PORT} get "$KEY" || etcdctl -C ${KV_IP}:${KV_PORT} set "$KEY" "$VALUE"
+          etcdctl -C ${KV_IP}:${KV_PORT} get "$KEY" > /dev/null 2>&1 || etcdctl -C ${KV_IP}:${KV_PORT} set "$KEY" "$VALUE"
         ;;
         *)
         echo "failed to process command $CMD with params $KEY $VALUE"
