@@ -167,6 +167,8 @@ function start_mon {
     echo "Make the monitor directory"
     mkdir -p /var/lib/ceph/mon/${CLUSTER}-${MON_NAME}
     chown ceph. /var/lib/ceph/mon/${CLUSTER}-${MON_NAME}
+    mkdir -p /var/run/ceph
+    chown ceph. /var/run/ceph
 
     create_socket_dir
 
