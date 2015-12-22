@@ -33,7 +33,7 @@ function kviatize {
 }
 
 function get_admin_key {
-   kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/adminKeyring > /etc/ceph/${CLUSTER}.client.admin.keyring
+   kviatize get ${CLUSTER_PATH}/adminKeyring > /etc/ceph/${CLUSTER}.client.admin.keyring
 }
 
 function get_mon_config {
@@ -51,16 +51,16 @@ function get_mon_config {
   fi
 
   echo "Adding Mon Host - ${MON_NAME}"
-  kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/mon_host/${MON_NAME} ${MON_IP} > /dev/null 2>&1
+  kviatize put ${CLUSTER_PATH}/mon_host/${MON_NAME} ${MON_IP} > /dev/null 2>&1
 
   # Acquire lock to not run into race conditions with parallel bootstraps
-  until kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}/lock $MON_NAME > /dev/null 2>&1 ; do
+  until kviatize cas ${CLUSTER_PATH}/lock $MON_NAME > /dev/null 2>&1 ; do
     echo "Configuration is locked by another host. Waiting."
     sleep 1
   done
 
   # Update config after initial mon creation
-  if kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/monSetupComplete > /dev/null 2>&1 ; then
+  if kviatize get ${CLUSTER_PATH}/monSetupComplete > /dev/null 2>&1 ; then
     echo "Configuration found for cluster ${CLUSTER}. Writing to disk."
 
 
@@ -73,16 +73,16 @@ function get_mon_config {
     mkdir -p /var/lib/ceph/bootstrap-{osd,mds,rgw}
 
     echo "Adding Keyrings"
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/monKeyring > /etc/ceph/${CLUSTER}.mon.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/adminKeyring > /etc/ceph/${CLUSTER}.client.admin.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/bootstrapOsdKeyring > /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/bootstrapMdsKeyring > /var/lib/ceph/bootstrap-mds/${CLUSTER}.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/bootstrapRgwKeyring > /var/lib/ceph/bootstrap-rgw/${CLUSTER}.keyring
+    kviatize get ${CLUSTER_PATH}/monKeyring > /etc/ceph/${CLUSTER}.mon.keyring
+    kviatize  get ${CLUSTER_PATH}/adminKeyring > /etc/ceph/${CLUSTER}.client.admin.keyring
+    kviatize  get ${CLUSTER_PATH}/bootstrapOsdKeyring > /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
+    kviatize  get ${CLUSTER_PATH}/bootstrapMdsKeyring > /var/lib/ceph/bootstrap-mds/${CLUSTER}.keyring
+    kviatize  get ${CLUSTER_PATH}/bootstrapRgwKeyring > /var/lib/ceph/bootstrap-rgw/${CLUSTER}.keyring
 
 
     if [ ! -f /etc/ceph/monmap ]; then
       echo "Monmap is missing. Adding initial monmap..."
-      kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/monmap > /etc/ceph/monmap
+      kviatize  get ${CLUSTER_PATH}/monmap > /etc/ceph/monmap
     fi
 
     echo "Trying to get the most recent monmap..."
@@ -97,7 +97,7 @@ function get_mon_config {
     echo "No configuration found for cluster ${CLUSTER}. Generating."
 
     FSID=$(uuidgen)
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/auth/fsid ${FSID}
+    kviatize  put ${CLUSTER_PATH}/auth/fsid ${FSID}
 
     until confd -onetime -backend ${KV_TYPE} -node ${KV_IP}:${KV_PORT} -prefix="/${CLUSTER_PATH}/" ; do
       echo "Waiting for confd to write initial templates..."
@@ -125,21 +125,21 @@ function get_mon_config {
     monmaptool --create --add ${MON_NAME} "${MON_IP}:6789" --fsid ${FSID} /etc/ceph/monmap
 
     echo "Importing Keyrings and Monmap to KV"
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/monKeyring - < /etc/ceph/${CLUSTER}.mon.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/adminKeyring - < /etc/ceph/${CLUSTER}.client.admin.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/bootstrapOsdKeyring - < /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/bootstrapMdsKeyring - < /var/lib/ceph/bootstrap-mds/${CLUSTER}.keyring
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/bootstrapRgwKeyring - < /var/lib/ceph/bootstrap-rgw/${CLUSTER}.keyring
+    kviatize  put ${CLUSTER_PATH}/monKeyring - < /etc/ceph/${CLUSTER}.mon.keyring
+    kviatize  put ${CLUSTER_PATH}/adminKeyring - < /etc/ceph/${CLUSTER}.client.admin.keyring
+    kviatize  put ${CLUSTER_PATH}/bootstrapOsdKeyring - < /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
+    kviatize  put ${CLUSTER_PATH}/bootstrapMdsKeyring - < /var/lib/ceph/bootstrap-mds/${CLUSTER}.keyring
+    kviatize  put ${CLUSTER_PATH}/bootstrapRgwKeyring - < /var/lib/ceph/bootstrap-rgw/${CLUSTER}.keyring
 
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/monmap - < /etc/ceph/monmap
+    kviatize  put ${CLUSTER_PATH}/monmap - < /etc/ceph/monmap
 
     echo "Completed initialization for ${MON_NAME}"
-    kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} put ${CLUSTER_PATH}/monSetupComplete true > /dev/null 2>&1
+    kviatize  put ${CLUSTER_PATH}/monSetupComplete true > /dev/null 2>&1
   fi
 
   # Remove lock for other clients to install
   echo "Removing lock for ${MON_NAME}"
-  kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} del ${CLUSTER_PATH}/lock > /dev/null 2>&1
+  kviatize  del ${CLUSTER_PATH}/lock > /dev/null 2>&1
 
 }
 
@@ -147,7 +147,7 @@ function get_config {
 
   CLUSTER_PATH=ceph-config/${CLUSTER}
 
-  until kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/monSetupComplete > /dev/null 2>&1 ; do
+  until kviatize  get ${CLUSTER_PATH}/monSetupComplete > /dev/null 2>&1 ; do
     echo "OSD: Waiting for monitor setup to complete..."
     sleep 5
   done
@@ -161,9 +161,9 @@ function get_config {
   mkdir -p /var/lib/ceph/bootstrap-{osd,mds,rgw}
 
   echo "Adding bootstrap keyrings"
-  kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/bootstrapOsdKeyring > /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
-  kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/bootstrapMdsKeyring > /var/lib/ceph/bootstrap-mds/${CLUSTER}.keyring
-  kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} get ${CLUSTER_PATH}/bootstrapRgwKeyring > /var/lib/ceph/bootstrap-rgw/${CLUSTER}.keyring
+  kviatize  get ${CLUSTER_PATH}/bootstrapOsdKeyring > /var/lib/ceph/bootstrap-osd/${CLUSTER}.keyring
+  kviatize  get ${CLUSTER_PATH}/bootstrapMdsKeyring > /var/lib/ceph/bootstrap-mds/${CLUSTER}.keyring
+  kviatize  get ${CLUSTER_PATH}/bootstrapRgwKeyring > /var/lib/ceph/bootstrap-rgw/${CLUSTER}.keyring
 
 }
 

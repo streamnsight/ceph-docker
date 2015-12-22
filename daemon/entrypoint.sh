@@ -86,7 +86,7 @@ function kv {
 	shift
 	VALUE="$*"
 	echo "adding key ${KEY} with value ${VALUE} to KV store"
-	kviatize --kvstore=${KV_TYPE} --client=${KV_IP}:${KV_PORT} cas ${CLUSTER_PATH}"${KEY}" "${VALUE}" || echo "value is already set"
+	kviatize cas ${CLUSTER_PATH}"${KEY}" "${VALUE}" || echo "value is already set"
 }
 
 function populate_kv {
