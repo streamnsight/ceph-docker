@@ -3,13 +3,13 @@ set -e
 
 # confd TLS config string
 TLS_STRING=""
-if [[ -z "$ETCDCTL_CA_FILE" ]]; then
+if [[ -n "$ETCDCTL_CA_FILE" ]]; then
   TLS_STRING="${TLS_STRING} -client-ca-keys=ETCDCTL_CA_FILE"
 fi
-if [[ -z "$ETCDCTL_CERT_FILE" ]]; then
+if [[ -n "$ETCDCTL_CERT_FILE" ]]; then
   TLS_STRING="${TLS_STRING} -client-cert=ETCDCTL_CERT_FILE"
 fi
-if [[ -z "$ETCDCTL_KEY_FILE" ]]; then
+if [[ -n "$ETCDCTL_KEY_FILE" ]]; then
   TLS_STRING="${TLS_STRING} -client-key=ETCDCTL_KEY_FILE"
 fi
 echo "TLS certs and key provided: using confd with $TLS_STRING"
